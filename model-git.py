@@ -68,18 +68,18 @@ class GIN_Net2(torch.nn.Module):
         self.ln6 = nn.Linear(gin_in_feature, gin_in_feature)
         self.ln7 = nn.Linear(gin_in_feature, gin_in_feature)
 
-        # --- 关键修改：分离 fc_att 的计算和激活函数 ---
+        
         self.fc_att_base = nn.Sequential(
             nn.Linear(1024, 256),
             nn.ReLU(),
             nn.Linear(256, 1),
         )
         self.sigmoid_activation = nn.Sigmoid()
-        # --- 修改结束 ---
+        
     
-    # --- 关键修改：forward 函数增加 tau_pred 参数 ---
+    
     def forward(self, x, edge_index, train_edge_id, p_matrix, fx, p=0.5, esm_tensor=None, tau_pred=1.0):
-        # (蛋白质序列编码部分，与您提供的代码一致)
+        
         x = x.transpose(1, 2)
         x = self.conv1d(x)
         x = self.bn1(x)
@@ -94,10 +94,9 @@ class GIN_Net2(torch.nn.Module):
              esm_embed = self.esm_fc(esm_tensor)
              x = esm_embed
 
-        # (7个子空间分支部分，与您提供的代码一致)
+        
         x1 = self.ln1(x)
         x2 = self.ln2(x)
-        # ... (x3 to x7)
         x3 = self.ln3(x)
         x4 = self.ln4(x)
         x5 = self.ln5(x)
@@ -106,7 +105,6 @@ class GIN_Net2(torch.nn.Module):
 
         x1 = self.gin_conv1(x1, edge_index)
         x2 = self.gin_conv1(x2, edge_index)
-        # ... (x3 to x7)
         x3 = self.gin_conv1(x3, edge_index)
         x4 = self.gin_conv1(x4, edge_index)
         x5 = self.gin_conv1(x5, edge_index)
@@ -115,10 +113,8 @@ class GIN_Net2(torch.nn.Module):
 
         f = None
         if fx:
-            # (从子空间特征计算 f_stack 的部分，与您提供的代码一致)
             f1 = self.global_avgpool1d(x1[fx[0]].T).T
             f2 = self.global_avgpool1d(x2[fx[1]].T).T
-            # ... (f3 to f7)
             f3 = self.global_avgpool1d(x3[fx[2]].T).T
             f4 = self.global_avgpool1d(x4[fx[3]].T).T
             f5 = self.global_avgpool1d(x5[fx[4]].T).T
@@ -127,10 +123,8 @@ class GIN_Net2(torch.nn.Module):
             f_stack = torch.stack([f1, f2, f3, f4, f5, f6, f7], dim=0)
             f_stack = torch.squeeze(f_stack)
 
-            # --- 关键修改：手动计算 att 并应用 tau_pred ---
             _, concatenated_matrix = pairwise_concatenate_and_score(f_stack, lambda t: t) # 只用它来做拼接
-            
-            # 1. 计算原始 logits
+
             att_logits = self.fc_att_base(concatenated_matrix)
             # 2. 应用温度缩放
             att_logits_scaled = att_logits / tau_pred
@@ -138,9 +132,7 @@ class GIN_Net2(torch.nn.Module):
             att = self.sigmoid_activation(att_logits_scaled)
             
             att = att.reshape(7, 6)
-            # --- 修改结束 ---
 
-            # (用 att 填充 f 矩阵的部分，与您提供的代码一致)
             f = torch.eye(7, device=x.device)
             fill_index = 0
             for i in range(7):
@@ -149,7 +141,6 @@ class GIN_Net2(torch.nn.Module):
                         f[i, j] = att.flatten()[fill_index]
                         fill_index += 1
 
-        # (最终的预测层部分，与您提供的代码一致)
         node_id = edge_index[:, train_edge_id]
         
         x1_out = F.relu(self.lin1(x1))
@@ -158,7 +149,6 @@ class GIN_Net2(torch.nn.Module):
         x1_out = torch.mul(x1_out[node_id[0]], x1_out[node_id[1]])
         x1_out = self.fc21(x1_out)
 
-        # ... (x2_out to x7_out)
         x2_out = F.relu(self.lin1(x2)); x2_out = F.dropout(x2_out, p=p, training=self.training); x2_out = self.lin2(x2_out); x2_out = torch.mul(x2_out[node_id[0]], x2_out[node_id[1]]); x2_out = self.fc22(x2_out)
         x3_out = F.relu(self.lin1(x3)); x3_out = F.dropout(x3_out, p=p, training=self.training); x3_out = self.lin2(x3_out); x3_out = torch.mul(x3_out[node_id[0]], x3_out[node_id[1]]); x3_out = self.fc23(x3_out)
         x4_out = F.relu(self.lin1(x4)); x4_out = F.dropout(x4_out, p=p, training=self.training); x4_out = self.lin2(x4_out); x4_out = torch.mul(x4_out[node_id[0]], x4_out[node_id[1]]); x4_out = self.fc24(x4_out)
@@ -168,5 +158,6 @@ class GIN_Net2(torch.nn.Module):
 
         x_final = torch.cat([x1_out, x2_out, x3_out, x4_out, x5_out, x6_out, x7_out], dim=-1)
         x_final = self.fc3(x_final)
+
 
         return x_final, f
