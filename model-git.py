@@ -126,9 +126,9 @@ class GIN_Net2(torch.nn.Module):
             _, concatenated_matrix = pairwise_concatenate_and_score(f_stack, lambda t: t) # 只用它来做拼接
 
             att_logits = self.fc_att_base(concatenated_matrix)
-            # 2. 应用温度缩放
+            # 应用温度缩放
             att_logits_scaled = att_logits / tau_pred
-            # 3. 应用激活函数得到最终分数
+            # 应用激活函数得到最终分数
             att = self.sigmoid_activation(att_logits_scaled)
             
             att = att.reshape(7, 6)
@@ -161,3 +161,4 @@ class GIN_Net2(torch.nn.Module):
 
 
         return x_final, f
+
