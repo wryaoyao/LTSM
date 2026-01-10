@@ -7,7 +7,7 @@ import numpy as np
 import argparse
 import torch
 import torch.nn as nn
-import torch.nn.functional as F  # 确保导入
+import torch.nn.functional as F 
 from gnn_data_FX16 import GNN_DATA
 from gnn_model_FX16 import GIN_Net2
 from utils import Metrictor_PPI, print_file
@@ -15,7 +15,6 @@ from BS_ES_NS import BS_ES_NS, BS_ES_NS_metrics
 from tensorboardX import SummaryWriter
 
 
-# 确保每次运行得到相同的随机结果
 np.random.seed(1)
 torch.manual_seed(1)
 torch.cuda.manual_seed(1)
@@ -53,14 +52,12 @@ parser.add_argument('--epochs', default=300, type=int,
                     help='train epoch number')
 parser.add_argument('--device', default='cuda:0', type=str,
                     help='cuda device, i.e. cuda:0 or cuda:1')
-# ------------------- 新增参数 -------------------
 parser.add_argument('--tau_prior', default=1.0, type=float,
                     help='temperature scaling for prior matrix')
 parser.add_argument('--gin_in_feature', default=256, type=int,
                     help='Feature dimension for GIN layers.')
 parser.add_argument('--lr', default=0.001, type=float,
                     help='Learning rate for the optimizer.')
-# -------------------------------------------------
 
 
 #曲线参数初始化
@@ -78,7 +75,7 @@ def train(model, graph, ppi_list, loss_fn, optimizer, device,
           result_file_path, summary_writer, save_path, args,
           batch_size=2048, epochs=1000, scheduler=None,
           got=False, t=0.26, esm_tensor=None):
-# ----------------------------------------------------------------
+
     global_step = 0
     global_best_valid_f1 = 0.0
     global_best_valid_f1_epoch = 0
@@ -147,10 +144,9 @@ def train(model, graph, ppi_list, loss_fn, optimizer, device,
             loss7 = loss_fn(output[:, 6], label[:, 6])
             loss = loss1 + loss2 + loss3 + loss4 + loss5 + loss6 + loss7
 
-            # -------------------  应用温度缩放计算 loss0 -------------------
+    
             if f is not None:
                 p_matrix_target = graph.p_matrix.to(device)
-                # 仅当 tau 不为 1.0 时应用缩放
                 if args.tau_prior != 1.0:
                     # 为避免 log(0) 或 0^(1/tau) 的问题，加入一个极小值
                     p_matrix_temp = p_matrix_target + 1e-9
@@ -227,7 +223,6 @@ def train(model, graph, ppi_list, loss_fn, optimizer, device,
                 loss7 = loss_fn(output[:, 6], label[:, 6])
                 loss = loss1 + loss2 + loss3 + loss4 + loss5 + loss6 + loss7
 
-                # ------------------- 验证集应用温度缩放 -------------------
                 if f is not None:
                     p_matrix_target = graph.p_matrix.to(device)
                     if args.tau_prior != 1.0:
@@ -236,7 +231,6 @@ def train(model, graph, ppi_list, loss_fn, optimizer, device,
                         p_matrix_target = F.normalize(p_matrix_temp, p=1, dim=1)
                     loss0 = mseloss(f.to(device), p_matrix_target)
                     loss = loss + t * loss0
-                # ----------------------------------------------------------------
 
                 valid_loss_sum += loss.item()
 
@@ -386,12 +380,10 @@ def main():
 
     summary_writer = SummaryWriter(save_path)
 
-    # ------------------- 传入 args 对象 -------------------
     train(model, graph, ppi_list, loss_fn, optimizer, device,
           result_file_path, summary_writer, save_path, args,
           batch_size=args.batch_size, epochs=args.epochs, scheduler=scheduler,
           got=args.graph_only_train, esm_tensor=esm_tensor)
-    # ---------------------------------------------------------
 
     summary_writer.close()
 
