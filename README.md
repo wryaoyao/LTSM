@@ -15,19 +15,13 @@ LTSM-GNN learns label-specific feature subspaces for different PPI types and ali
 
 ## Requirements
 
-The code is implemented in Python and PyTorch. The main dependencies include:
+The recommended environment can be created with:
 
 ```bash
-python >= 3.8
-pytorch
-numpy
-scipy
-scikit-learn
-pandas
-tqdm
+conda env create -f environment.yml
+conda activate ppi_gnn_linux
 ````
-
-A detailed dependency file will be provided in `requirements.txt`.
+The code was tested with Python 3.9, PyTorch 2.5.1, CUDA 11.8 and PyTorch Geometric 2.6.1.
 
 ## Data preparation
 
