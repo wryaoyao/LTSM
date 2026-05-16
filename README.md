@@ -6,11 +6,11 @@ LTSM-GNN learns label-specific feature subspaces for different PPI types and ali
 
 ## Repository contents
 
-- `model-git.py`: model architecture of LTSM-GNN.
+- `gnn_model_FX16.py`: model architecture of LTSM-GNN.
 - `train-git.py`: training script.
 - `gnn_test.py`: evaluation script.
 - `gnn_test_bigger.py`: evaluation script for larger-scale settings.
-- `data-git.py`: data loading and preprocessing utilities.
+- `gnn_data_FX16.py`: data loading and preprocessing utilities.
 - `data.7z`: processed data used for model training and testing.
 
 ## Requirements
