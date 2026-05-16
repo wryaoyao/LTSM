@@ -73,7 +73,7 @@ The repository contains the source code, processed data and scripts required to 
 If you use this code or data, please cite the corresponding manuscript:
 
 ```
-Fu et al. Link Type Subspace Modeling with GNNs for Protein-Protein Interaction Prediction.
+ Wang et al. Link Type Subspace Modeling with GNNs for Protein-Protein Interaction Prediction.
 ```
 
 ## License
