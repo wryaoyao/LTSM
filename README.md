@@ -39,8 +39,7 @@ The original benchmark datasets are available from the following sources:
 
 ### Data splits
 
-The files in `train_valid_index_json/` store the fixed data splits used in the manuscript.
- For historical naming reasons, `valid_index` denotes the held-out evaluation/test subset used for reporting the results, while `train_index` denotes the training subset. The random, BFS and DFS split files correspond to the partition protocols reported in the manuscript.
+Fixed partition files for the random, BFS, and DFS evaluation protocols are provided in `train_valid_index_json/`. In these files, `train_index` denotes the training subset and `valid_index` denotes the held-out evaluation subset used for model evaluation.
 
  ### Ground-truth labels
 
@@ -71,6 +70,7 @@ python gnn_test_bigger.py
 ## Reproducibility
 
 The repository contains the source code, processed data and scripts required to reproduce the main experiments reported in the manuscript. Experiments are conducted under random, BFS and DFS partition protocols following the benchmark settings used in previous PPI prediction studies. The version associated with the submitted manuscript is release `v1.0.0`.
+The submitted version is archived at Zenodo: https://doi.org/10.5281/zenodo.20118534
 
 ## Citation
 
