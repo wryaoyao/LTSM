@@ -42,6 +42,10 @@ The original benchmark datasets are available from the following sources:
 The files in `train_valid_index_json/` store the fixed data splits used in the manuscript.
  For historical naming reasons, `valid_index` denotes the held-out evaluation/test subset used for reporting the results, while `train_index` denotes the training subset. The random, BFS and DFS split files correspond to the partition protocols reported in the manuscript.
 
+ ### Ground-truth labels
+
+The ground-truth labels are derived from the interaction/action type field in the STRING-derived PPI files, such as `protein.actions.SHS27k.STRING.txt` and `protein.actions.SHS148k.STRING.txt`. Following previous multi-type PPI prediction benchmarks, each protein pair is assigned a seven-dimensional multi-hot label over the interaction types `reaction`, `binding`, `ptmod`, `activation`, `inhibition`, `catalysis`, and `expression`. If the same protein pair is associated with multiple interaction types, all corresponding label dimensions are set to 1.
+
 ## Training
 
 After extracting the data, run:
