@@ -318,8 +318,8 @@ class GNN_DATA:
                 random.shuffle(random_list)
 
                 self.ppi_split_dict = {}
-                self.ppi_split_dict['train_index'] = random_list[: int(ppi_num * (1 - test_size))]
-                self.ppi_split_dict['valid_index'] = random_list[int(ppi_num * test_size):]
+                self.ppi_split_dict['train_index'] = random_list[:split_point]
+                self.ppi_split_dict['valid_index'] = random_list[split_point:]
 
                 jsobj = json.dumps(self.ppi_split_dict)
                 with open(train_valid_index_path, 'w') as f:
