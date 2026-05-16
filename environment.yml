@@ -22,5 +22,3 @@ dependencies:
   - tensorboardx=2.6.2.2
   - pyyaml=6.0.2
   - pip
-  - pip:
-      - argparse==1.4.0
